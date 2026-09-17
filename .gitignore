@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+
+# bkit tool runtime/state (not project source)
+.bkit/
+
+# Node / Next.js (for future implementation)
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env*.local
+
+# Supabase local
+.supabase/
