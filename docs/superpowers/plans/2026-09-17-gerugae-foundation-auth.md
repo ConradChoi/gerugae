@@ -79,10 +79,10 @@ gerugae/
 - [ ] **Step 1: Next.js 프로젝트 생성**
 
 ```bash
-npx create-next-app@14 gerugae-app --typescript --eslint --app --no-tailwind --src-dir=false --import-alias "@/*"
+npx create-next-app@14 gerugae-app --typescript --eslint --app --no-tailwind --import-alias "@/*"
 ```
 
-프롬프트가 뜨면 기본값(App Router 사용, `@/*` alias)으로 진행한다. 생성된 `gerugae-app/` 디렉토리 내용을 프로젝트 루트(`/Users/ylia/Documents/service/gerugae`)로 옮기고 `gerugae-app` 디렉토리는 제거한다.
+`--src-dir` 플래그는 주지 않는다(플래그를 생략하면 기본값이 "src 디렉토리 미사용"이라 `app/`이 프로젝트 루트에 바로 생성된다). 프롬프트가 뜨면 기본값(App Router 사용, `@/*` alias)으로 진행한다. 생성된 `gerugae-app/` 디렉토리 내용을 프로젝트 루트(`/Users/ylia/Documents/service/gerugae`)로 옮기고 `gerugae-app` 디렉토리는 제거한다.
 
 ```bash
 mv gerugae-app/* gerugae-app/.[!.]* . 2>/dev/null
