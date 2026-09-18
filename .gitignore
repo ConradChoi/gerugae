@@ -4,6 +4,9 @@
 # bkit tool runtime/state (not project source)
 .bkit/
 
+# superpowers subagent-driven-development scratch workspace
+.superpowers/
+
 # Node / Next.js (for future implementation)
 node_modules/
 .next/
