@@ -21,19 +21,24 @@ export function SignupForm() {
     if (!result.valid) return
 
     setSubmitting(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { nickname: nickname.trim() } },
-    })
-    setSubmitting(false)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { nickname: nickname.trim() } },
+      })
 
-    if (error) {
-      setSubmitError(error.message)
-      return
+      if (error) {
+        setSubmitError(error.message)
+        return
+      }
+      window.location.href = '/home'
+    } catch {
+      setSubmitError('일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setSubmitting(false)
     }
-    window.location.href = '/home'
   }
 
   return (

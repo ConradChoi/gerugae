@@ -12,7 +12,7 @@ export function validateSignupInput(
   if (!EMAIL_REGEX.test(input.email)) {
     errors.email = '올바른 이메일 형식이 아닙니다.'
   }
-  if (input.password.length < 8) {
+  if (input.password.length < 8 || input.password.trim().length === 0) {
     errors.password = '비밀번호는 8자 이상이어야 합니다.'
   }
   const trimmedNickname = input.nickname.trim()

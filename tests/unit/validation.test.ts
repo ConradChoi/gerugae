@@ -51,6 +51,16 @@ describe('validateSignupInput', () => {
     expect(result.valid).toBe(false)
     expect(result.errors.nickname).toBeDefined()
   })
+
+  it('비밀번호가 공백으로만 이루어지면 password 에러를 반환한다', () => {
+    const result = validateSignupInput({
+      email: 'user@example.com',
+      password: '        ',
+      nickname: '거르개유저',
+    })
+    expect(result.valid).toBe(false)
+    expect(result.errors.password).toBeDefined()
+  })
 })
 
 describe('validateLoginInput', () => {
