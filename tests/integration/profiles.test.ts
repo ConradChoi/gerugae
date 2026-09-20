@@ -27,9 +27,20 @@ function randomEmail() {
   return `test-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`
 }
 
+// vitest.config.ts runs this suite under environment: 'jsdom', which provides a
+// real `window.localStorage`. @supabase/supabase-js persists auth sessions there
+// under a storage key derived only from the project ref, so every createClient(...)
+// call in this file would otherwise share ONE localStorage session: whichever
+// signUp() ran last leaks into every other client created afterwards, including
+// the one meant to be anonymous. Do not remove this option to "simplify" the
+// calls below - persistSession: false keeps each client's session in memory only
+// (still enough for that client's own subsequent requests), so sessions no longer
+// cross-contaminate between clients.
+const ISOLATED_AUTH = { auth: { persistSession: false, autoRefreshToken: false } } as const
+
 describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
   it('회원가입 시 닉네임이 담긴 profiles 행이 자동 생성된다', async () => {
-    const supabase = createClient(SUPABASE_URL, ANON_KEY)
+    const supabase = createClient(SUPABASE_URL, ANON_KEY, ISOLATED_AUTH)
     const email = randomEmail()
 
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -52,8 +63,8 @@ describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
   })
 
   it('다른 사용자의 닉네임은 수정할 수 없다', async () => {
-    const supabaseA = createClient(SUPABASE_URL, ANON_KEY)
-    const supabaseB = createClient(SUPABASE_URL, ANON_KEY)
+    const supabaseA = createClient(SUPABASE_URL, ANON_KEY, ISOLATED_AUTH)
+    const supabaseB = createClient(SUPABASE_URL, ANON_KEY, ISOLATED_AUTH)
 
     const { data: signUpA } = await supabaseA.auth.signUp({
       email: randomEmail(),
@@ -83,7 +94,15 @@ describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
   })
 
   it('인증되지 않은 클라이언트는 profiles를 조회할 수 없다', async () => {
-    const anonSupabase = createClient(SUPABASE_URL, ANON_KEY)
+    const anonSupabase = createClient(SUPABASE_URL, ANON_KEY, ISOLATED_AUTH)
+
+    // Guard the premise of this test: if a session ever leaked in again (e.g. this
+    // isolation option gets removed later), fail here with a clear message instead
+    // of silently passing/failing the RLS assertion below for the wrong reason.
+    const {
+      data: { session },
+    } = await anonSupabase.auth.getSession()
+    expect(session).toBeNull()
 
     const { data, error } = await anonSupabase.from('profiles').select('id, nickname')
 
