@@ -32,7 +32,10 @@ export async function middleware(request: NextRequest) {
   if (redirectPath) {
     const url = request.nextUrl.clone()
     url.pathname = redirectPath
-    return NextResponse.redirect(url)
+    url.search = ''
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((c) => redirectResponse.cookies.set(c))
+    return redirectResponse
   }
 
   return supabaseResponse

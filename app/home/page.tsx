@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from '@/components/LogoutButton'
 
@@ -7,10 +8,14 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  if (!user) {
+    redirect('/login')
+  }
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('nickname')
-    .eq('id', user!.id)
+    .eq('id', user.id)
     .maybeSingle()
 
   if (error) {

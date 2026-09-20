@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 
 const maybeSingleMock = vi.fn()
 const getUserMock = vi.fn()
+const redirectMock = vi.fn()
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
@@ -21,11 +22,16 @@ vi.mock('@/components/LogoutButton', () => ({
   LogoutButton: () => <button>로그아웃</button>,
 }))
 
+vi.mock('next/navigation', () => ({
+  redirect: (path: string) => redirectMock(path),
+}))
+
 import HomePage from '@/app/home/page'
 
 beforeEach(() => {
   getUserMock.mockReset()
   maybeSingleMock.mockReset()
+  redirectMock.mockReset()
   getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
 })
 
@@ -59,5 +65,17 @@ describe('HomePage', () => {
       screen.getByText('기업 리뷰/정보공유 기능은 다음 단계에서 이 자리에 추가됩니다.')
     ).toBeInTheDocument()
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('user가 없으면 /login으로 리다이렉트하고 프로필을 조회하지 않는다', async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } })
+    redirectMock.mockImplementation(() => {
+      throw new Error('NEXT_REDIRECT')
+    })
+
+    await expect(HomePage()).rejects.toThrow('NEXT_REDIRECT')
+
+    expect(redirectMock).toHaveBeenCalledWith('/login')
+    expect(maybeSingleMock).not.toHaveBeenCalled()
   })
 })
