@@ -290,59 +290,75 @@ git commit -m "feat: Supabase 브라우저/서버 클라이언트 헬퍼 추가"
 
 ---
 
-### Task 3: Supabase 로컬 개발 환경 + profiles 스키마/트리거/RLS
+### Task 3: 클라우드 Supabase profiles 스키마/트리거/RLS
+
+> **변경 이력 (2026-09-20):** 원래 이 태스크는 Docker + Supabase CLI로 로컬 DB를 띄우는 방식이었다. 사용자가 Docker를 쓰지 않기로 하여, 이미 생성해 둔 **클라우드 Supabase 프로젝트**에 직접 스키마를 적용하는 방식으로 대체한다. 통합 테스트도 그 클라우드 프로젝트를 향해 실행한다(테스트 계정이 실제로 생성되며, 사용자가 이를 승인했다).
 
 **Files:**
-- Create: `supabase/config.toml`, `supabase/migrations/0001_init.sql` (Supabase CLI가 생성)
+- Create: `supabase/migrations/0001_init.sql`
 - Test: `tests/integration/profiles.test.ts`
 
 **Interfaces:**
 - Consumes: 없음
 - Produces: `public.profiles(id uuid, nickname text, created_at timestamptz)` 테이블. 이후 모든 태스크(리뷰, 정보글 등)는 `author_id`/`created_by`로 이 테이블을 참조한다.
 
-- [ ] **Step 1: Supabase CLI 설치 및 로컬 프로젝트 초기화**
+- [ ] **Step 1: 클라우드 프로젝트 연결 정보 확인 (사용자 작업)**
 
-Docker Desktop이 실행 중이어야 한다.
+Docker와 Supabase CLI는 사용하지 않는다. 사용자가 Supabase 대시보드(Project Settings → API)에서 Project URL과 anon public key를 `.env.local`에 채워 둔다:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon public key>
+```
+
+또한 Authentication → Sign In / Providers → Email에서 **Confirm email을 끈다.** 켜져 있으면 `signUp` 직후 세션이 발급되지 않아 가입 직후 리다이렉트와 이 태스크의 통합 테스트가 모두 실패한다. (출시 전에 다시 켜고, 이메일 인증 안내 화면을 별도 태스크로 추가한다.)
+
+- [ ] **Step 2: 환경변수 로딩 확인**
+
+`.env.local`에 값이 채워졌는지 확인한다 (키 값 자체는 출력하지 않는다):
 
 ```bash
-npm install -D supabase
-npx supabase init
-npx supabase start
+node -e "require('fs').readFileSync('.env.local','utf8').split('\n').filter(Boolean).forEach(l=>console.log(l.split('=')[0], l.split('=')[1]?'(set)':'(empty)'))"
 ```
-
-`npx supabase start` 출력에서 `API URL`, `anon key`, `service_role key`를 기록해 둔다 (다음 스텝에서 사용).
-
-- [ ] **Step 2: 로컬 환경변수 파일 작성**
-
-`.env.local` (git에 커밋되지 않음, `.env.local.example`을 참고해 실제 값 입력):
-
-```
-NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<supabase start 출력의 anon key>
-```
+Expected: `NEXT_PUBLIC_SUPABASE_URL (set)`, `NEXT_PUBLIC_SUPABASE_ANON_KEY (set)`
 
 - [ ] **Step 3: 마이그레이션 파일 생성 및 실패하는 통합 테스트 작성**
 
-```bash
-npx supabase migration new init
-```
-
-방금 생성된 `supabase/migrations/<timestamp>_init.sql` 파일명을 `0001_init.sql`로 변경한다.
+`supabase/migrations/0001_init.sql` 파일을 직접 생성한다(CLI 불필요). 통합 테스트는 `.env.local`의 클라우드 URL/anon key를 읽어 실행하며, 환경변수가 없으면 스킵한다.
 
 `tests/integration/profiles.test.ts`:
 
 ```ts
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
+import { readFileSync } from 'node:fs'
 
-const SUPABASE_URL = 'http://127.0.0.1:54321'
-const ANON_KEY = process.env.SUPABASE_LOCAL_ANON_KEY!
+function loadEnvLocal(): Record<string, string> {
+  try {
+    return Object.fromEntries(
+      readFileSync('.env.local', 'utf8')
+        .split('\n')
+        .filter((line) => line.trim() && !line.trim().startsWith('#'))
+        .map((line) => {
+          const idx = line.indexOf('=')
+          return [line.slice(0, idx).trim(), line.slice(idx + 1).trim()]
+        })
+    )
+  } catch {
+    return {}
+  }
+}
+
+const env = loadEnvLocal()
+const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+const ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+const hasCredentials = Boolean(SUPABASE_URL && ANON_KEY)
 
 function randomEmail() {
   return `test-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`
 }
 
-describe('profiles 테이블 트리거/RLS', () => {
+describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
   it('회원가입 시 닉네임이 담긴 profiles 행이 자동 생성된다', async () => {
     const supabase = createClient(SUPABASE_URL, ANON_KEY)
     const email = randomEmail()
@@ -398,14 +414,14 @@ describe('profiles 테이블 트리거/RLS', () => {
 })
 ```
 
-`SUPABASE_LOCAL_ANON_KEY` 환경변수는 실행 시 셸에서 주입한다 (다음 스텝 참고).
+테스트는 `.env.local`의 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`를 읽는다. Vitest는 `.env.local`을 자동으로 읽지 않으므로 테스트 파일 상단에서 직접 로드한다 (`dotenv` 미설치 시 `fs`로 파싱해도 된다). 두 값이 없으면 `describe.skip`으로 건너뛴다 — CI나 키 없는 환경에서 빨간 실패 대신 스킵되도록 한다.
 
 - [ ] **Step 4: 테스트 실행하여 실패 확인**
 
 ```bash
-SUPABASE_LOCAL_ANON_KEY=<anon key> npm test -- tests/integration/profiles.test.ts
+npm test -- tests/integration/profiles.test.ts
 ```
-Expected: FAIL — `relation "public.profiles" does not exist`
+Expected: FAIL — `relation "public.profiles" does not exist` (또는 PostgREST의 `PGRST205: Could not find the table 'public.profiles'`)
 
 - [ ] **Step 5: 마이그레이션 SQL 작성**
 
@@ -454,25 +470,31 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 ```
 
-- [ ] **Step 6: 마이그레이션 적용**
+- [ ] **Step 6: 마이그레이션 적용 (대시보드 SQL Editor)**
 
-```bash
-npx supabase db reset
-```
+Supabase 대시보드 → SQL Editor → New query에 `supabase/migrations/0001_init.sql` 내용을 그대로 붙여넣고 Run 한다. CLI도 Docker도 필요하지 않다.
+
+적용 후 Table Editor에 `profiles` 테이블이 보이고, 해당 테이블의 RLS가 Enabled 상태이며 정책 2개(`profiles_select_authenticated`, `profiles_update_own`)가 등록되었는지 확인한다.
+
+> 재실행 주의: 이 SQL은 `create table` / `create function` / `create trigger`를 사용하므로 두 번 실행하면 "already exists" 오류가 난다. 다시 적용해야 할 경우 해당 객체를 먼저 삭제하거나 `create or replace` / `drop ... if exists`를 앞에 붙인다.
 
 - [ ] **Step 7: 테스트 통과 확인**
 
 ```bash
-SUPABASE_LOCAL_ANON_KEY=<anon key> npm test -- tests/integration/profiles.test.ts
+npm test -- tests/integration/profiles.test.ts
 ```
 Expected: PASS (2 tests)
+
+이 테스트는 클라우드 프로젝트에 `test-...@example.com` 형태의 계정을 실제로 생성한다(사용자 승인 완료). 쌓인 테스트 계정은 대시보드 Authentication → Users에서 주기적으로 삭제한다.
 
 - [ ] **Step 8: 커밋**
 
 ```bash
-git add supabase tests/integration/profiles.test.ts
+git add supabase/migrations/0001_init.sql tests/integration/profiles.test.ts
 git commit -m "feat: profiles 테이블, 가입 트리거, RLS 정책 추가"
 ```
+
+`.env.local`은 절대 커밋하지 않는다 (`.gitignore`에 포함됨).
 
 ---
 
