@@ -38,6 +38,7 @@ describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
       options: { data: { nickname: '테스트유저' } },
     })
     expect(signUpError).toBeNull()
+    expect(signUpData.session).not.toBeNull()
     const userId = signUpData.user!.id
 
     const { data: profile, error: profileError } = await supabase
@@ -79,5 +80,14 @@ describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
     expect(unchangedProfile?.nickname).toBe('A유저')
     void signUpB
     void error
+  })
+
+  it('인증되지 않은 클라이언트는 profiles를 조회할 수 없다', async () => {
+    const anonSupabase = createClient(SUPABASE_URL, ANON_KEY)
+
+    const { data, error } = await anonSupabase.from('profiles').select('id, nickname')
+
+    expect(error).toBeNull()
+    expect(data).toEqual([])
   })
 })
