@@ -42,5 +42,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)'],
+  // Next가 생성하는 메타데이터 경로(icon, apple-icon 등)는 확장자가 없어
+  // 파일 확장자 규칙만으로는 걸러지지 않으므로 이름으로 함께 제외한다
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|manifest.webmanifest|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)',
+  ],
 }
