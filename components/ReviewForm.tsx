@@ -14,14 +14,24 @@ export function ReviewForm({
   companyId,
   companyName,
   tags,
+  reviewId,
+  initialRating = 0,
+  initialContent = '',
+  initialTagIds = [],
 }: {
   companyId: string
   companyName: string
   tags: TagOption[]
+  /** 있으면 수정 모드 */
+  reviewId?: string
+  initialRating?: number
+  initialContent?: string
+  initialTagIds?: string[]
 }) {
-  const [rating, setRating] = useState(0)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [content, setContent] = useState('')
+  const isEdit = Boolean(reviewId)
+  const [rating, setRating] = useState(initialRating)
+  const [selectedTags, setSelectedTags] = useState<string[]>(initialTagIds)
+  const [content, setContent] = useState(initialContent)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [alreadyReviewed, setAlreadyReviewed] = useState(false)
@@ -47,26 +57,42 @@ export function ReviewForm({
     setSubmitting(true)
     try {
       const supabase = createClient()
-      const { data, error } = await supabase
-        .from('reviews')
-        .insert({ company_id: companyId, rating, content: content.trim() })
-        .select('id')
-        .single()
 
-      if (error) {
-        // 23505 = unique 위반. 이 기업에는 이미 후기를 남겼다는 뜻이다.
-        if (error.code === '23505') {
-          setAlreadyReviewed(true)
+      let savedId = reviewId
+      if (isEdit) {
+        const { error } = await supabase
+          .from('reviews')
+          .update({ rating, content: content.trim() })
+          .eq('id', reviewId!)
+        if (error) {
+          setSubmitError('수정하지 못했습니다. 입력한 내용을 확인해 주세요.')
           return
         }
-        setSubmitError('등록하지 못했습니다. 입력한 내용을 확인해 주세요.')
-        return
+        // 태그는 지우고 다시 넣는다 (선택 해제까지 반영하기 위해)
+        await supabase.from('review_tags').delete().eq('review_id', reviewId!)
+      } else {
+        const { data, error } = await supabase
+          .from('reviews')
+          .insert({ company_id: companyId, rating, content: content.trim() })
+          .select('id')
+          .single()
+
+        if (error) {
+          // 23505 = unique 위반. 이 기업에는 이미 후기를 남겼다는 뜻이다.
+          if (error.code === '23505') {
+            setAlreadyReviewed(true)
+            return
+          }
+          setSubmitError('등록하지 못했습니다. 입력한 내용을 확인해 주세요.')
+          return
+        }
+        savedId = data.id
       }
 
       if (selectedTags.length > 0) {
         const { error: tagError } = await supabase
           .from('review_tags')
-          .insert(selectedTags.map((tagId) => ({ review_id: data.id, tag_id: tagId })))
+          .insert(selectedTags.map((tagId) => ({ review_id: savedId, tag_id: tagId })))
         if (tagError) {
           console.error('ReviewForm: failed to attach tags', tagError)
         }
@@ -206,7 +232,7 @@ export function ReviewForm({
       )}
 
       <Button type="submit" fullWidth disabled={submitting}>
-        후기 등록
+        {isEdit ? '후기 수정' : '후기 등록'}
       </Button>
     </form>
   )

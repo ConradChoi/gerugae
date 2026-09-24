@@ -31,7 +31,20 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-export default async function CompanyDetailPage({ params }: { params: { id: string } }) {
+type PostRow = {
+  id: string
+  title: string
+  created_at: string
+  author: { nickname: string } | null
+}
+
+export default async function CompanyDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string }
+  searchParams: { tab?: string }
+}) {
   const supabase = await createClient()
   const {
     data: { user },
@@ -78,10 +91,16 @@ export default async function CompanyDetailPage({ params }: { params: { id: stri
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
 
-  const { count: postCount } = await supabase
+  const activeTab = searchParams.tab === 'posts' ? 'posts' : 'reviews'
+
+  const { data: postData, count: postCount } = await supabase
     .from('community_posts')
-    .select('id', { count: 'exact', head: true })
+    .select('id, title, created_at, author:profiles(nickname)', { count: 'exact' })
     .eq('company_id', company.id)
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  const posts = (postData ?? []) as unknown as PostRow[]
 
   return (
     <div className={layout.page}>
@@ -122,11 +141,55 @@ export default async function CompanyDetailPage({ params }: { params: { id: stri
         </section>
 
         <nav className={styles.tabs}>
-          <span className={`${styles.tab} ${styles.tabActive}`}>후기 {reviews.length}</span>
-          <span className={styles.tab}>정보공유 {postCount ?? 0}</span>
+          <Link
+            href={`/companies/${company.id}`}
+            className={`${styles.tab} ${activeTab === 'reviews' ? styles.tabActive : ''}`}
+          >
+            후기 {reviews.length}
+          </Link>
+          <Link
+            href={`/companies/${company.id}?tab=posts`}
+            className={`${styles.tab} ${activeTab === 'posts' ? styles.tabActive : ''}`}
+          >
+            정보공유 {postCount ?? 0}
+          </Link>
         </nav>
 
-        {reviews.length > 0 ? (
+        {activeTab === 'posts' ? (
+          <div className={styles.list}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Link href={`/posts/new?company=${company.id}`}>
+                <Button variant="secondary">정보글 쓰기</Button>
+              </Link>
+            </div>
+            {posts.length > 0 ? (
+              <ul className={styles.list} style={{ padding: 0 }}>
+                {posts.map((post) => (
+                  <li key={post.id} className={styles.card}>
+                    <div className={styles.cardHead}>
+                      <Link href={`/posts/${post.id}`} className="type-label-l">
+                        {post.title}
+                      </Link>
+                      <span className={`type-body-s ${styles.author}`}>
+                        {post.author?.nickname ?? '알 수 없음'} · {formatDate(post.created_at)}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className={styles.empty}>
+                <h2 className="type-h3">아직 정보글이 없습니다</h2>
+                <p className={`type-body-m ${styles.emptyDesc}`}>
+                  이 기업과 일하며 알게 된 점을 나눠 주세요.
+                </p>
+                <Link href={`/posts/new?company=${company.id}`}>
+                  <Button variant="primary">정보글 쓰기</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : reviews.length > 0 ? (
           <ul className={styles.list}>
             {reviews.map((review) => (
               <li key={review.id} className={styles.card}>

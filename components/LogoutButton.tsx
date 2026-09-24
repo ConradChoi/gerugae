@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/Button'
 
 export function LogoutButton() {
   const [error, setError] = useState<string | null>(null)
@@ -20,8 +21,14 @@ export function LogoutButton() {
 
   return (
     <>
-      <button onClick={handleLogout}>로그아웃</button>
-      {error && <p role="alert">{error}</p>}
+      <Button variant="ghost" onClick={handleLogout}>
+        로그아웃
+      </Button>
+      {error && (
+        <p className="type-body-s" role="alert" style={{ color: 'var(--color-status-error-fg)' }}>
+          {error}
+        </p>
+      )}
     </>
   )
 }
