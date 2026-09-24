@@ -74,3 +74,14 @@ export function validateCompanyInput(
 
   return { valid: Object.keys(errors).length === 0, errors }
 }
+
+/**
+ * 사업자등록번호를 000-00-00000 형태로 만든다.
+ * 입력 중에도 호출되므로 아직 자릿수가 모자란 값도 부분적으로 포맷한다.
+ */
+export function formatBizRegNumber(raw: string): string {
+  const digits = raw.replace(/[^0-9]/g, '').slice(0, 10)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`
+}

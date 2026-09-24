@@ -204,3 +204,35 @@ describe.skipIf(!hasCredentials)('community_posts 테이블 RLS', () => {
     expect(after?.title).toBe('계약 팁')
   })
 })
+
+describe.skipIf(!hasCredentials)('홈 화면 목록 쿼리', () => {
+  it('최근 등록된 기업과 최근 후기를 조회할 수 있다', async () => {
+    const { client } = await sharedUser('author')
+
+    const { data: company } = await client
+      .from('companies')
+      .insert({ name: randomName('홈노출'), category: '웹에이전시' })
+      .select('id, name')
+      .single()
+    await client
+      .from('reviews')
+      .insert({ company_id: company!.id, rating: 5, content: '홈 화면 노출 확인용 후기입니다.' })
+
+    const { data: companies, error: companyError } = await client
+      .from('companies')
+      .select('id, name, category')
+      .order('created_at', { ascending: false })
+      .limit(5)
+    expect(companyError).toBeNull()
+    expect(companies!.some((c) => c.id === company!.id)).toBe(true)
+
+    const { data: reviews, error: reviewError } = await client
+      .from('reviews')
+      .select('id, rating, content, created_at, company:companies(id, name), author:profiles(nickname)')
+      .order('created_at', { ascending: false })
+      .limit(5)
+    expect(reviewError).toBeNull()
+    expect(reviews!.length).toBeGreaterThan(0)
+    expect(reviews![0]).toHaveProperty('author')
+  })
+})

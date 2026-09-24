@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
   COMPANY_CATEGORIES,
+  formatBizRegNumber,
   normalizeBizRegNumber,
   validateCompanyInput,
 } from '@/lib/validation'
@@ -99,8 +100,10 @@ export function CompanyForm({ initialName = '' }: { initialName?: string }) {
           id="company-biz"
           className={`${styles.input} ${errors.bizRegNumber ? styles.inputError : ''}`}
           placeholder="123-45-67890"
+          inputMode="numeric"
+          maxLength={12}
           value={bizRegNumber}
-          onChange={(e) => setBizRegNumber(e.target.value)}
+          onChange={(e) => setBizRegNumber(formatBizRegNumber(e.target.value))}
         />
         {errors.bizRegNumber ? (
           <p className={styles.error} role="alert">

@@ -3,6 +3,7 @@ import {
   validateSignupInput,
   validateLoginInput,
   validateCompanyInput,
+  formatBizRegNumber,
 } from '@/lib/validation'
 
 describe('validateSignupInput', () => {
@@ -129,5 +130,33 @@ describe('validateCompanyInput', () => {
       category: '기타',
     })
     expect(result.valid).toBe(true)
+  })
+})
+
+describe('formatBizRegNumber', () => {
+  it('숫자만 입력하면 000-00-00000 형태로 만든다', () => {
+    expect(formatBizRegNumber('1234567890')).toBe('123-45-67890')
+  })
+
+  it('입력 중인 짧은 숫자도 부분적으로 포맷한다', () => {
+    expect(formatBizRegNumber('12')).toBe('12')
+    expect(formatBizRegNumber('1234')).toBe('123-4')
+    expect(formatBizRegNumber('123456')).toBe('123-45-6')
+  })
+
+  it('이미 하이픈이 있어도 중복해서 붙이지 않는다', () => {
+    expect(formatBizRegNumber('123-45-67890')).toBe('123-45-67890')
+  })
+
+  it('숫자가 아닌 문자는 무시한다', () => {
+    expect(formatBizRegNumber('12a3-45b')).toBe('123-45')
+  })
+
+  it('10자리를 넘는 입력은 잘라낸다', () => {
+    expect(formatBizRegNumber('12345678901234')).toBe('123-45-67890')
+  })
+
+  it('빈 값은 빈 문자열을 돌려준다', () => {
+    expect(formatBizRegNumber('')).toBe('')
   })
 })
