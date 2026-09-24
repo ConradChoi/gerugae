@@ -10,8 +10,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "vitest run tests/unit tests/components",
+    "test:watch": "vitest tests/unit tests/components",
+    "test:integration": "vitest run tests/integration",
+    "test:all": "vitest run"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

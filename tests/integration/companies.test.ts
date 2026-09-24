@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { anonClient, hasCredentials, randomName, signUpUser } from './helpers'
+import { anonClient, hasCredentials, randomName, sharedUser } from './helpers'
 
 describe.skipIf(!hasCredentials)('companies 테이블 RLS / 제약', () => {
   it('로그인 사용자는 기업을 등록할 수 있고, 등록자가 created_by로 기록된다', async () => {
-    const { client, userId } = await signUpUser('등록자')
+    const { client, userId } = await sharedUser('author')
 
     const { data, error } = await client
       .from('companies')
@@ -16,7 +16,7 @@ describe.skipIf(!hasCredentials)('companies 테이블 RLS / 제약', () => {
   })
 
   it('비로그인 사용자는 기업 목록을 읽을 수 없다', async () => {
-    const { client } = await signUpUser('작성자')
+    const { client } = await sharedUser('author')
     await client.from('companies').insert({ name: randomName('비공개확인'), category: '원천사' })
 
     const anon = anonClient()
@@ -26,7 +26,7 @@ describe.skipIf(!hasCredentials)('companies 테이블 RLS / 제약', () => {
   })
 
   it('같은 사업자등록번호로는 중복 등록할 수 없다', async () => {
-    const { client } = await signUpUser('중복테스트')
+    const { client } = await sharedUser('author')
     const bizNumber = String(Date.now()).slice(-10)
 
     const first = await client
@@ -46,8 +46,8 @@ describe.skipIf(!hasCredentials)('companies 테이블 RLS / 제약', () => {
   })
 
   it('다른 사람이 등록한 기업 정보는 수정할 수 없다', async () => {
-    const owner = await signUpUser('주인')
-    const stranger = await signUpUser('남')
+    const owner = await sharedUser('author')
+    const stranger = await sharedUser('stranger')
 
     const { data: company } = await owner.client
       .from('companies')
@@ -69,7 +69,7 @@ describe.skipIf(!hasCredentials)('companies 테이블 RLS / 제약', () => {
 
 describe.skipIf(!hasCredentials)('reviews 테이블 RLS / 제약', () => {
   it('기업당 한 사람은 후기를 하나만 남길 수 있다', async () => {
-    const { client } = await signUpUser('리뷰어')
+    const { client } = await sharedUser('author')
     const { data: company } = await client
       .from('companies')
       .insert({ name: randomName('리뷰대상'), category: '원천사' })
@@ -93,7 +93,7 @@ describe.skipIf(!hasCredentials)('reviews 테이블 RLS / 제약', () => {
   })
 
   it('별점은 1~5 범위를 벗어날 수 없다', async () => {
-    const { client } = await signUpUser('별점테스트')
+    const { client } = await sharedUser('author')
     const { data: company } = await client
       .from('companies')
       .insert({ name: randomName('별점대상'), category: '원천사' })
@@ -108,8 +108,8 @@ describe.skipIf(!hasCredentials)('reviews 테이블 RLS / 제약', () => {
   })
 
   it('본인 후기는 수정·삭제할 수 있고, 남의 후기는 건드릴 수 없다', async () => {
-    const author = await signUpUser('후기작성자')
-    const stranger = await signUpUser('타인')
+    const author = await sharedUser('author')
+    const stranger = await sharedUser('stranger')
 
     const { data: company } = await author.client
       .from('companies')
@@ -151,7 +151,7 @@ describe.skipIf(!hasCredentials)('reviews 테이블 RLS / 제약', () => {
 
 describe.skipIf(!hasCredentials)('tags / review_tags', () => {
   it('고정 태그 목록을 읽을 수 있고 후기에 연결할 수 있다', async () => {
-    const { client } = await signUpUser('태그테스트')
+    const { client } = await sharedUser('author')
 
     const { data: tags, error: tagError } = await client.from('tags').select('id, label')
     expect(tagError).toBeNull()
@@ -178,8 +178,8 @@ describe.skipIf(!hasCredentials)('tags / review_tags', () => {
 
 describe.skipIf(!hasCredentials)('community_posts 테이블 RLS', () => {
   it('정보글을 쓰고 본인 글만 수정할 수 있다', async () => {
-    const author = await signUpUser('정보글작성자')
-    const stranger = await signUpUser('정보글타인')
+    const author = await sharedUser('author')
+    const stranger = await sharedUser('stranger')
 
     const { data: company } = await author.client
       .from('companies')

@@ -41,6 +41,19 @@ export function randomName(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+/**
+ * Supabase는 가입 요청 수를 제한하므로(초과 시 "Request rate limit reached"),
+ * 테스트마다 새 계정을 만들지 않고 파일 단위로 몇 개만 만들어 돌려 쓴다.
+ */
+const userPool = new Map<string, Promise<{ client: SupabaseClient; userId: string }>>()
+
+export function sharedUser(key: string, nickname = key) {
+  if (!userPool.has(key)) {
+    userPool.set(key, signUpUser(nickname))
+  }
+  return userPool.get(key)!
+}
+
 /** 새 계정을 만들고 로그인된 클라이언트와 user id를 돌려준다 */
 export async function signUpUser(nickname: string) {
   const client = anonClient()
