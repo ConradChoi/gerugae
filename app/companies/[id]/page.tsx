@@ -5,6 +5,7 @@ import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
 import { Rating } from '@/components/ui/Rating'
+import { ReportButton } from '@/components/ReportButton'
 import layout from '@/components/layout/Layout.module.css'
 import styles from './detail.module.css'
 
@@ -132,10 +133,11 @@ export default async function CompanyDetailPage({
                 ))}
               </div>
             )}
-            <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
               <Link href={`/reviews/new?company=${company.id}`}>
                 <Button variant="primary">이 기업 후기 쓰기</Button>
               </Link>
+              <ReportButton targetType="company" targetId={company.id} label="기업 정보 오류 알리기" />
             </div>
           </div>
         </section>
@@ -211,6 +213,9 @@ export default async function CompanyDetailPage({
                   </div>
                 )}
                 <p className="type-body-m">{review.content}</p>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <ReportButton targetType="review" targetId={review.id} />
+                </div>
               </li>
             ))}
           </ul>

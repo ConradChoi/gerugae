@@ -27,7 +27,9 @@ export const hasCredentials = Boolean(SUPABASE_URL && ANON_KEY)
 
 // jsdom 환경에서는 localStorage가 프로젝트별로 하나뿐이라 클라이언트끼리
 // 세션이 섞인다. persistSession: false로 각 클라이언트가 자기 세션만 갖게 한다.
-const ISOLATED_AUTH = { auth: { persistSession: false, autoRefreshToken: false } } as const
+// autoRefreshToken은 켜둔다 — 계정을 파일 단위로 재사용하므로 테스트가 길어지면
+// 토큰이 만료되어 PGRST303(JWT expired)으로 간헐 실패한다.
+const ISOLATED_AUTH = { auth: { persistSession: false, autoRefreshToken: true } } as const
 
 export function anonClient(): SupabaseClient {
   return createClient(SUPABASE_URL, ANON_KEY, ISOLATED_AUTH)

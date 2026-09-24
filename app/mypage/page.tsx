@@ -20,6 +20,7 @@ type MyReview = {
   rating: number
   content: string
   created_at: string
+  hidden_at: string | null
   company: { id: string; name: string } | null
 }
 
@@ -27,7 +28,24 @@ type MyPost = {
   id: string
   title: string
   created_at: string
+  hidden_at: string | null
   company: { id: string; name: string } | null
+}
+
+function HiddenNotice() {
+  return (
+    <p
+      className="type-body-s"
+      style={{
+        padding: 'var(--spacing-xs) var(--spacing-sm)',
+        borderRadius: 'var(--radius-sm)',
+        background: 'var(--color-status-error-bg)',
+        color: 'var(--color-status-error-fg)',
+      }}
+    >
+      신고 검토 결과 가려진 글입니다. 나와 운영자에게만 보입니다.
+    </p>
+  )
 }
 
 function formatDate(iso: string) {
@@ -53,13 +71,13 @@ export default async function MyPage() {
 
   const { data: reviewData } = await supabase
     .from('reviews')
-    .select('id, rating, content, created_at, company:companies(id, name)')
+    .select('id, rating, content, created_at, hidden_at, company:companies(id, name)')
     .eq('author_id', user.id)
     .order('created_at', { ascending: false })
 
   const { data: postData } = await supabase
     .from('community_posts')
-    .select('id, title, created_at, company:companies(id, name)')
+    .select('id, title, created_at, hidden_at, company:companies(id, name)')
     .eq('author_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -100,6 +118,7 @@ export default async function MyPage() {
                         {formatDate(review.created_at)}
                       </span>
                     </div>
+                    {review.hidden_at && <HiddenNotice />}
                     <Rating value={review.rating} size={18} />
                     <p className="type-body-m">{review.content}</p>
                     <div className={styles.actions}>
@@ -138,6 +157,7 @@ export default async function MyPage() {
                         {formatDate(post.created_at)}
                       </span>
                     </div>
+                    {post.hidden_at && <HiddenNotice />}
                     <p className={`type-body-s ${styles.meta}`}>
                       {post.company?.name ?? '삭제된 기업'}
                     </p>

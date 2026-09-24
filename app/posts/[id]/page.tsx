@@ -5,6 +5,7 @@ import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
 import { DeleteButton } from '@/components/ui/DeleteButton'
+import { ReportButton } from '@/components/ReportButton'
 import layout from '@/components/layout/Layout.module.css'
 import styles from './post.module.css'
 
@@ -65,20 +66,24 @@ export default async function PostDetailPage({ params }: { params: { id: string 
           </p>
           <p className={`type-body-l ${styles.content}`}>{post.content}</p>
 
-          {isOwner && (
-            <div className={styles.actions}>
-              <Link href={`/posts/${post.id}/edit`}>
-                <Button variant="secondary">수정</Button>
-              </Link>
-              <DeleteButton
-                table="community_posts"
-                id={post.id}
-                title="이 글을 삭제할까요?"
-                description="삭제하면 되돌릴 수 없습니다."
-                redirectTo={post.company ? `/companies/${post.company.id}?tab=posts` : '/mypage'}
-              />
-            </div>
-          )}
+          <div className={styles.actions}>
+            {isOwner ? (
+              <>
+                <Link href={`/posts/${post.id}/edit`}>
+                  <Button variant="secondary">수정</Button>
+                </Link>
+                <DeleteButton
+                  table="community_posts"
+                  id={post.id}
+                  title="이 글을 삭제할까요?"
+                  description="삭제하면 되돌릴 수 없습니다."
+                  redirectTo={post.company ? `/companies/${post.company.id}?tab=posts` : '/mypage'}
+                />
+              </>
+            ) : (
+              <ReportButton targetType="post" targetId={post.id} />
+            )}
+          </div>
         </article>
       </main>
       <Footer />
