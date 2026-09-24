@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { validateSignupInput, validateLoginInput } from '@/lib/validation'
+import {
+  validateSignupInput,
+  validateLoginInput,
+  validateCompanyInput,
+} from '@/lib/validation'
 
 describe('validateSignupInput', () => {
   it('올바른 입력은 valid:true를 반환한다', () => {
@@ -73,5 +77,57 @@ describe('validateLoginInput', () => {
     const result = validateLoginInput({ email: 'user@example.com', password: '' })
     expect(result.valid).toBe(false)
     expect(result.errors.password).toBeDefined()
+  })
+})
+
+describe('validateCompanyInput', () => {
+  it('올바른 입력은 valid:true를 반환한다', () => {
+    const result = validateCompanyInput({
+      name: '주식회사 거르개',
+      bizRegNumber: '123-45-67890',
+      category: '웹에이전시',
+    })
+    expect(result.valid).toBe(true)
+    expect(result.errors).toEqual({})
+  })
+
+  it('사업자등록번호는 비워둘 수 있다', () => {
+    const result = validateCompanyInput({
+      name: '주식회사 거르개',
+      bizRegNumber: '',
+      category: '원천사',
+    })
+    expect(result.valid).toBe(true)
+  })
+
+  it('기업 이름이 비어있으면 name 에러를 반환한다', () => {
+    const result = validateCompanyInput({ name: '   ', bizRegNumber: '', category: '원천사' })
+    expect(result.valid).toBe(false)
+    expect(result.errors.name).toBeDefined()
+  })
+
+  it('분류를 고르지 않으면 category 에러를 반환한다', () => {
+    const result = validateCompanyInput({ name: '거르개', bizRegNumber: '', category: '' })
+    expect(result.valid).toBe(false)
+    expect(result.errors.category).toBeDefined()
+  })
+
+  it('사업자등록번호 숫자가 10자리가 아니면 에러를 반환한다', () => {
+    const result = validateCompanyInput({
+      name: '거르개',
+      bizRegNumber: '123-45-678',
+      category: '원천사',
+    })
+    expect(result.valid).toBe(false)
+    expect(result.errors.bizRegNumber).toBeDefined()
+  })
+
+  it('하이픈이 없어도 숫자 10자리면 통과한다', () => {
+    const result = validateCompanyInput({
+      name: '거르개',
+      bizRegNumber: '1234567890',
+      category: '기타',
+    })
+    expect(result.valid).toBe(true)
   })
 })
