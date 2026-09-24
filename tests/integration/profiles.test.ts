@@ -106,7 +106,12 @@ describe.skipIf(!hasCredentials)('profiles 테이블 트리거/RLS', () => {
 
     const { data, error } = await anonSupabase.from('profiles').select('id, nickname')
 
-    expect(error).toBeNull()
-    expect(data).toEqual([])
+    // 0004에서 anon의 SELECT 권한 자체를 회수했으므로 권한 오류(42501)가 난다.
+    // 그 전에는 RLS가 행을 걸러 빈 배열이 나왔다. 둘 다 "읽을 수 없음"이므로 함께 허용한다.
+    if (error) {
+      expect(error.code).toBe('42501')
+    } else {
+      expect(data).toEqual([])
+    }
   })
 })

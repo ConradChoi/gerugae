@@ -41,14 +41,11 @@ export default async function AdminReportsPage() {
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .maybeSingle()
+  // is_admin 컬럼은 일반 사용자에게 조회 권한이 없다. 본인 여부만 함수로 확인한다.
+  const { data: isAdmin } = await supabase.rpc('is_admin')
 
   // 관리자가 아니면 이 화면의 존재 자체를 알리지 않는다
-  if (!profile?.is_admin) {
+  if (!isAdmin) {
     notFound()
   }
 

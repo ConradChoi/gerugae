@@ -110,9 +110,10 @@ describe.skipIf(!hasCredentials)('프로필 권한', () => {
 
     await client.from('profiles').update({ is_admin: true }).eq('id', userId)
 
-    const { data } = await client.from('profiles').select('is_admin').eq('id', userId).single()
+    // is_admin 컬럼은 조회 권한이 없으므로 함수로 확인한다
+    const { data } = await client.rpc('is_admin')
 
-    expect(data?.is_admin).toBe(false)
+    expect(data).toBe(false)
   })
 
   it('닉네임은 여전히 수정할 수 있다', async () => {
@@ -124,5 +125,33 @@ describe.skipIf(!hasCredentials)('프로필 권한', () => {
 
     const { data } = await client.from('profiles').select('nickname').eq('id', userId).single()
     expect(data?.nickname).toBe(nickname)
+  })
+})
+
+describe.skipIf(!hasCredentials)('관리자 정보 노출 차단', () => {
+  it('일반 사용자는 누가 관리자인지 조회할 수 없다', async () => {
+    const { client } = await sharedUser('stranger')
+
+    const { error } = await client.from('profiles').select('id, nickname, is_admin').limit(1)
+
+    expect(error).not.toBeNull()
+  })
+
+  it('닉네임 조회는 계속 가능하다', async () => {
+    const { client } = await sharedUser('stranger')
+
+    const { data, error } = await client.from('profiles').select('id, nickname').limit(1)
+
+    expect(error).toBeNull()
+    expect(data).not.toBeNull()
+  })
+
+  it('본인의 관리자 여부는 is_admin 함수로 확인할 수 있다', async () => {
+    const { client } = await sharedUser('stranger')
+
+    const { data, error } = await client.rpc('is_admin')
+
+    expect(error).toBeNull()
+    expect(data).toBe(false)
   })
 })
