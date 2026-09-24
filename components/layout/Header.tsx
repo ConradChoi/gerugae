@@ -13,7 +13,8 @@ export function PublicHeader() {
         <Link href="/login" className={styles.navLink}>
           로그인
         </Link>
-        <Link href="/signup" className={styles.navLink} data-variant="primary">
+        {/* 비로그인 상태에서는 작성 화면 대신 로그인으로 보낸다 */}
+        <Link href="/login?from=review" className={styles.navLink} data-variant="primary">
           후기 작성
         </Link>
       </nav>
