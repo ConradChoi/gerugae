@@ -1,13 +1,133 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primitives */
+  --graphite-900: #1b1f27;
+  --graphite-800: #2a2f3a;
+  --graphite-700: #3a4150;
+  --graphite-600: #545c6e;
+  --graphite-500: #6e778a;
+  --graphite-400: #8a8f9c;
+  --graphite-300: #b6bac4;
+  --graphite-200: #d9dce2;
+  --graphite-100: #eceef2;
+  --graphite-50: #f6f7f9;
+  --amber-700: #c79a1f;
+  --amber-600: #e0b72b;
+  --amber-500: #ffd84d;
+  --amber-300: #ffe480;
+  --amber-100: #fff6d6;
+  --red-700: #9e2f2f;
+  --red-600: #b93a3a;
+  --red-500: #d64545;
+  --red-100: #fbe9e9;
+  --green-600: #237b53;
+  --green-500: #2e9e6b;
+  --green-100: #e4f4ec;
+  --blue-600: #2f63ae;
+  --blue-500: #3b7dd8;
+  --blue-100: #e6effa;
+
+  /* Semantic — light */
+  --color-bg-canvas: #ffffff;
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: var(--graphite-50);
+  --color-bg-inverse: var(--graphite-800);
+  --color-bg-surface-hover: var(--graphite-50);
+  --color-text-primary: var(--graphite-800);
+  --color-text-secondary: var(--graphite-500);
+  --color-text-disabled: var(--graphite-300);
+  --color-text-inverse: #ffffff;
+  --color-border-default: var(--graphite-200);
+  --color-border-strong: var(--graphite-800);
+  --color-border-focus: var(--blue-500);
+  --color-brand-primary: var(--graphite-800);
+  --color-brand-primary-hover: var(--graphite-900);
+  --color-brand-accent: var(--amber-500);
+  --color-status-error-fg: var(--red-600);
+  --color-status-error-fg-hover: var(--red-700);
+  --color-status-error-bg: var(--red-100);
+  --color-status-success-fg: var(--green-600);
+  --color-status-success-bg: var(--green-100);
+  --color-status-info-fg: var(--blue-600);
+  --color-status-info-bg: var(--blue-100);
+  --color-rating-filled: var(--amber-500);
+  --color-rating-empty: var(--graphite-200);
+  --color-tag-neutral-bg: var(--graphite-100);
+  --color-tag-neutral-text: var(--graphite-700);
+  --color-tag-alert-bg: var(--red-100);
+  --color-tag-alert-text: var(--red-600);
+  --color-tag-positive-bg: var(--green-100);
+  --color-tag-positive-text: var(--green-600);
+  --color-tag-selected-bg: var(--amber-500);
+  --color-tag-selected-text: var(--graphite-900);
+
+  /* Spacing */
+  --spacing-2xs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+  --spacing-5xl: 64px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  /* Shadow */
+  --shadow-sm: 0 2px 4px rgba(23, 28, 36, 0.06);
+  --shadow-md: 0 6px 16px rgba(23, 28, 36, 0.1);
+  --shadow-lg: 0 12px 32px rgba(23, 28, 36, 0.14);
+
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-bg-canvas: var(--graphite-900);
+    --color-bg-surface: var(--graphite-800);
+    --color-bg-subtle: var(--graphite-700);
+    --color-bg-inverse: var(--graphite-50);
+    --color-bg-surface-hover: var(--graphite-700);
+    --color-text-primary: var(--graphite-50);
+    --color-text-secondary: var(--graphite-300);
+    --color-text-disabled: var(--graphite-600);
+    --color-text-inverse: var(--graphite-900);
+    --color-border-default: var(--graphite-700);
+    --color-border-strong: var(--graphite-300);
+    --color-brand-primary: var(--graphite-50);
+    --color-brand-primary-hover: var(--graphite-100);
+    --color-status-error-fg: var(--red-500);
+    --color-status-error-fg-hover: var(--red-600);
+    --color-status-error-bg: var(--red-600);
+    --color-status-success-fg: var(--green-500);
+    --color-status-success-bg: var(--green-600);
+    --color-status-info-fg: var(--blue-500);
+    --color-status-info-bg: var(--blue-600);
+    --color-rating-empty: var(--graphite-600);
+    --color-tag-neutral-bg: var(--graphite-700);
+    --color-tag-neutral-text: var(--graphite-100);
+    --color-tag-alert-bg: var(--red-600);
+    --color-tag-alert-text: var(--red-100);
+    --color-tag-positive-bg: var(--green-600);
+    --color-tag-positive-text: var(--green-100);
   }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
@@ -17,17 +137,13 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 24px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
@@ -35,8 +151,72 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* 키보드 사용자에게만 포커스 링을 보여준다 */
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* 타이포 스케일 */
+.type-display {
+  font-size: 48px;
+  line-height: 56px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.type-h1 {
+  font-size: 32px;
+  line-height: 42px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.type-h2 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.type-h3 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.type-body-l {
+  font-size: 17px;
+  line-height: 28px;
+}
+.type-body-m {
+  font-size: 15px;
+  line-height: 24px;
+}
+.type-body-s {
+  font-size: 13px;
+  line-height: 20px;
+}
+.type-label-l {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.type-label-m {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+}
+.type-caption {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .type-display {
+    font-size: 32px;
+    line-height: 42px;
+  }
+  .type-h1 {
+    font-size: 24px;
+    line-height: 32px;
   }
 }

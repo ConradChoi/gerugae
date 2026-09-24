@@ -45,10 +45,10 @@ describe('HomePage', () => {
 
     render(await HomePage())
 
-    expect(screen.getByText('환영합니다, 거르개유저님')).toBeInTheDocument()
     expect(
-      screen.getByText('기업 리뷰/정보공유 기능은 다음 단계에서 이 자리에 추가됩니다.')
+      screen.getByRole('heading', { name: '거르개유저님, 어떤 기업과 일하시나요?' })
     ).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('기업 이름으로 검색')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '로그아웃' })).toBeInTheDocument()
   })
 
@@ -59,11 +59,8 @@ describe('HomePage', () => {
     render(await HomePage())
 
     expect(document.body.textContent).not.toContain('undefined')
-    expect(screen.getByText('환영합니다')).toBeInTheDocument()
-    expect(screen.getByText('프로필 정보를 불러오지 못했습니다.')).toBeInTheDocument()
-    expect(
-      screen.getByText('기업 리뷰/정보공유 기능은 다음 단계에서 이 자리에 추가됩니다.')
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '어떤 기업과 일하시나요?' })).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('기업 이름으로 검색')).toBeInTheDocument()
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
   })
 

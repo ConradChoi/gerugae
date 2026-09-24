@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { validateSignupInput } from '@/lib/validation'
+import { Button } from '@/components/ui/Button'
+import styles from '@/components/ui/Field.module.css'
 
 export function SignupForm() {
   const [email, setEmail] = useState('')
@@ -42,41 +44,78 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <div>
-        <label htmlFor="signup-email">이메일</label>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}
+    >
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="signup-email">
+          이메일
+        </label>
         <input
           id="signup-email"
           type="email"
+          placeholder="you@example.com"
+          className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        {errors.email && <p role="alert">{errors.email}</p>}
+        {errors.email ? (
+          <p className={styles.error} role="alert">
+            {errors.email}
+          </p>
+        ) : (
+          <p className={styles.helper}>로그인할 때 사용합니다</p>
+        )}
       </div>
-      <div>
-        <label htmlFor="signup-password">비밀번호</label>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="signup-password">
+          비밀번호
+        </label>
         <input
           id="signup-password"
           type="password"
+          className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {errors.password && <p role="alert">{errors.password}</p>}
+        {errors.password ? (
+          <p className={styles.error} role="alert">
+            {errors.password}
+          </p>
+        ) : (
+          <p className={styles.helper}>8자 이상 입력해 주세요</p>
+        )}
       </div>
-      <div>
-        <label htmlFor="signup-nickname">닉네임</label>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="signup-nickname">
+          닉네임
+        </label>
         <input
           id="signup-nickname"
           type="text"
+          placeholder="거르개유저"
+          className={`${styles.input} ${errors.nickname ? styles.inputError : ''}`}
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
         />
-        {errors.nickname && <p role="alert">{errors.nickname}</p>}
+        {errors.nickname ? (
+          <p className={styles.error} role="alert">
+            {errors.nickname}
+          </p>
+        ) : (
+          <p className={styles.helper}>후기에 이 이름으로 표시됩니다. 나중에 바꿀 수 있습니다</p>
+        )}
       </div>
-      {submitError && <p role="alert">{submitError}</p>}
-      <button type="submit" disabled={submitting}>
+      {submitError && (
+        <p className={styles.error} role="alert">
+          {submitError}
+        </p>
+      )}
+      <Button type="submit" fullWidth disabled={submitting}>
         가입하기
-      </button>
+      </Button>
     </form>
   )
 }

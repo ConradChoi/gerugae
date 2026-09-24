@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { validateLoginInput } from '@/lib/validation'
+import { Button } from '@/components/ui/Button'
+import styles from '@/components/ui/Field.module.css'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -37,31 +39,54 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <div>
-        <label htmlFor="login-email">이메일</label>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}
+    >
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="login-email">
+          이메일
+        </label>
         <input
           id="login-email"
           type="email"
+          placeholder="you@example.com"
+          className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        {errors.email && <p role="alert">{errors.email}</p>}
+        {errors.email && (
+          <p className={styles.error} role="alert">
+            {errors.email}
+          </p>
+        )}
       </div>
-      <div>
-        <label htmlFor="login-password">비밀번호</label>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="login-password">
+          비밀번호
+        </label>
         <input
           id="login-password"
           type="password"
+          className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {errors.password && <p role="alert">{errors.password}</p>}
+        {errors.password && (
+          <p className={styles.error} role="alert">
+            {errors.password}
+          </p>
+        )}
       </div>
-      {submitError && <p role="alert">{submitError}</p>}
-      <button type="submit" disabled={submitting}>
+      {submitError && (
+        <p className={styles.error} role="alert">
+          {submitError}
+        </p>
+      )}
+      <Button type="submit" fullWidth disabled={submitting}>
         로그인
-      </button>
+      </Button>
     </form>
   )
 }
