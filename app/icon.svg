@@ -1,12 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
   <rect width="240" height="240" rx="53" fill="#FFD84D"/>
-  <g transform="translate(36 45) scale(0.7)" fill="#2A2F3A">
-    <path d="M16 2 L88 90 L16 90 Z"/>
-    <path d="M224 2 L224 90 L152 90 Z"/>
-    <path d="M0 0 H240 L120 215 Z"/>
-  </g>
-  <g transform="translate(36 45) scale(0.7)" fill="#FFD84D">
-    <path d="M46 64 H94 L70 100 Z"/>
-    <path d="M150 64 H198 L174 100 Z"/>
+  <g transform="translate(120 120) scale(0.68) translate(-120 -120)">
+    <g fill="#2A2F3A" stroke="#2A2F3A" stroke-linejoin="round">
+      <path d="M52 20 L22 84 L82 84 Z" stroke-width="16"/>
+      <path d="M188 20 L158 84 L218 84 Z" stroke-width="16"/>
+      <path d="M16 78 L224 78 L120 222 Z" stroke-width="24"/>
+    </g>
+    <g fill="#FFD84D" stroke="#FFD84D" stroke-width="6" stroke-linejoin="round">
+      <path d="M56 116 H94 L75 148 Z"/>
+      <path d="M146 116 H184 L165 148 Z"/>
+    </g>
   </g>
 </svg>
