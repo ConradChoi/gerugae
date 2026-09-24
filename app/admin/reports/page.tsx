@@ -42,7 +42,12 @@ export default async function AdminReportsPage() {
   }
 
   // is_admin 컬럼은 일반 사용자에게 조회 권한이 없다. 본인 여부만 함수로 확인한다.
-  const { data: isAdmin } = await supabase.rpc('is_admin')
+  const { data: isAdmin, error: adminCheckError } = await supabase.rpc('is_admin')
+
+  if (adminCheckError) {
+    // 권한 확인 자체가 실패한 경우다. 조용히 404를 내면 원인을 알 수 없다.
+    console.error('AdminReportsPage: is_admin() 호출 실패', adminCheckError, 'user:', user.id)
+  }
 
   // 관리자가 아니면 이 화면의 존재 자체를 알리지 않는다
   if (!isAdmin) {
