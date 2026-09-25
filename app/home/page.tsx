@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireMember } from '@/lib/membership'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { GerugaeSymbol } from '@/components/ui/Logo'
@@ -26,14 +25,7 @@ type RecentReview = {
 }
 
 export default async function HomePage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const { supabase, user } = await requireMember()
 
   const { data: profile, error } = await supabase
     .from('profiles')

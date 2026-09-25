@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { notFound, redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { notFound } from 'next/navigation'
+import { requireMember } from '@/lib/membership'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
@@ -46,14 +46,7 @@ export default async function CompanyDetailPage({
   params: { id: string }
   searchParams: { tab?: string }
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const { supabase } = await requireMember()
 
   const { data: company } = await supabase
     .from('companies')

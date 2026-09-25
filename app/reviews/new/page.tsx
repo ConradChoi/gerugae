@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireMember } from '@/lib/membership'
 import { ReviewForm, type TagOption } from '@/components/ReviewForm'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -18,14 +17,7 @@ export default async function NewReviewPage({
 }: {
   searchParams: { company?: string }
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const { supabase } = await requireMember()
 
   const companyId = searchParams.company
 

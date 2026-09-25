@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireMember } from '@/lib/membership'
 import { CompanyForm } from '@/components/CompanyForm'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -16,14 +15,7 @@ export default async function NewCompanyPage({
 }: {
   searchParams: { name?: string }
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  await requireMember()
 
   return (
     <div className={layout.page}>

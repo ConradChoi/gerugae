@@ -5,21 +5,37 @@ const maybeSingleMock = vi.fn()
 const getUserMock = vi.fn()
 const redirectMock = vi.fn()
 
-// 홈은 프로필 외에 최근 기업·후기도 조회한다. 목록 쿼리는 빈 배열을 돌려준다.
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: { getUser: getUserMock },
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          maybeSingle: maybeSingleMock,
-        }),
-        order: () => ({
-          limit: async () => ({ data: [], error: null }),
-        }),
+// 홈은 requireMember()로 로그인+초대 코드 사용 여부를 함께 확인한다.
+const supabaseStub = {
+  auth: { getUser: getUserMock },
+  rpc: async () => ({ data: true, error: null }),
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        maybeSingle: maybeSingleMock,
+      }),
+      order: () => ({
+        limit: async () => ({ data: [], error: null }),
       }),
     }),
   }),
+}
+
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: async () => supabaseStub,
+}))
+
+vi.mock('@/lib/membership', () => ({
+  requireMember: async () => {
+    const {
+      data: { user },
+    } = await getUserMock()
+    if (!user) {
+      redirectMock('/login')
+      throw new Error('NEXT_REDIRECT')
+    }
+    return { supabase: supabaseStub, user }
+  },
 }))
 
 vi.mock('@/components/LogoutButton', () => ({

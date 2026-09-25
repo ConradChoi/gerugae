@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireMember } from '@/lib/membership'
 import { ReviewForm, type TagOption } from '@/components/ReviewForm'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -21,14 +21,7 @@ type ReviewRow = {
 }
 
 export default async function EditReviewPage({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const { supabase, user } = await requireMember()
 
   const { data } = await supabase
     .from('reviews')

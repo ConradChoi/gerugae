@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireMember } from '@/lib/membership'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { NicknameForm } from '@/components/NicknameForm'
+import { InviteCodePanel } from '@/components/InviteCodePanel'
 import { DeleteButton } from '@/components/ui/DeleteButton'
 import { Button } from '@/components/ui/Button'
 import { Rating } from '@/components/ui/Rating'
@@ -54,20 +54,23 @@ function formatDate(iso: string) {
 }
 
 export default async function MyPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const { supabase, user } = await requireMember()
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('nickname')
     .eq('id', user.id)
     .maybeSingle()
+
+  const { data: codeData } = await supabase
+    .from('invite_codes')
+    .select('code, max_uses, used_count, expires_at')
+    .eq('issuer_id', user.id)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  const activeCode = (codeData ?? []).find((c) => c.used_count < c.max_uses) ?? null
 
   const { data: reviewData } = await supabase
     .from('reviews')
@@ -95,6 +98,15 @@ export default async function MyPage() {
             <h2 className="type-h3">내 정보</h2>
             <p className={`type-body-s ${styles.meta}`}>이메일 {user.email}</p>
             <NicknameForm userId={user.id} initialNickname={profile?.nickname ?? ''} />
+          </section>
+
+          <section className={styles.panel}>
+            <h2 className="type-h3">초대하기</h2>
+            <p className={`type-body-s ${styles.meta}`}>
+              거르개는 초대받은 분만 이용할 수 있습니다. 함께 쓰면 좋을 프리랜서에게 코드를 전달해
+              주세요.
+            </p>
+            <InviteCodePanel initialCode={activeCode} />
           </section>
 
           <section className={styles.section}>
