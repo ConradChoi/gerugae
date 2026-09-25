@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { hasCredentials, randomName, sharedUser, signUpUser } from './helpers'
+import { hasCredentials, randomName, sharedNonMember, sharedUser, signUpUser } from './helpers'
 
 describe.skipIf(!hasCredentials)('초대 코드', () => {
   it('회원은 코드를 발급받을 수 있고, 다시 요청해도 같은 코드가 나온다', async () => {
@@ -21,14 +21,14 @@ describe.skipIf(!hasCredentials)('초대 코드', () => {
       .from('companies')
       .insert({ name: randomName('초대검증'), category: '원천사' })
 
-    const outsider = await signUpUser('초대안받은사람')
+    const outsider = await sharedNonMember('outsider')
     const { data } = await outsider.client.from('companies').select('id')
 
     expect(data).toEqual([])
   })
 
   it('코드를 쓰지 않은 계정은 기업을 등록할 수도 없다', async () => {
-    const outsider = await signUpUser('등록시도자')
+    const outsider = await sharedNonMember('outsider')
 
     const { error } = await outsider.client
       .from('companies')
@@ -68,23 +68,22 @@ describe.skipIf(!hasCredentials)('초대 코드', () => {
     })
     expect(selfResult).toBe('이미 가입이 완료된 계정입니다')
 
-    const outsider = await signUpUser('잘못된코드사용자')
+    const outsider = await sharedNonMember('outsider')
     const { data: wrongResult } = await outsider.client.rpc('redeem_invite_code', {
       input_code: 'ZZZZZZZZ',
     })
     expect(wrongResult).toBe('존재하지 않는 코드입니다')
   })
 
-  it('남의 초대 코드는 조회할 수 없다', async () => {
+  it('남의 초대 코드는 조회되지 않는다', async () => {
     const owner = await sharedUser('author')
-    await owner.client.rpc('issue_invite_code')
+    const { data: issued } = await owner.client.rpc('issue_invite_code')
+    const ownerCode = issued?.[0]?.code as string
 
     const other = await sharedUser('stranger')
     const { data } = await other.client.from('invite_codes').select('code')
 
-    // 자기 코드만 보여야 한다
-    const ownCodes = data ?? []
-    const { data: mine } = await other.client.from('invite_codes').select('code')
-    expect(ownCodes.length).toBe((mine ?? []).length)
+    const visible = (data ?? []).map((row) => row.code)
+    expect(visible).not.toContain(ownerCode)
   })
 })
