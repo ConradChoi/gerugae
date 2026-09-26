@@ -93,7 +93,7 @@ export default async function HomePage() {
                         {review.company?.name ?? '삭제된 기업'}
                       </Link>
                       <span className={`type-body-s ${styles.searchSub}`}>
-                        {review.author?.nickname ?? '알 수 없음'} · {formatDate(review.created_at)}
+                        {review.author?.nickname ?? '탈퇴한 회원'} · {formatDate(review.created_at)}
                       </span>
                     </div>
                     <Rating value={review.rating} size={18} />

@@ -55,7 +55,7 @@ export default async function PostDetailPage({ params }: { params: { id: string 
           )}
           <h1 className="type-h1">{post.title}</h1>
           <p className={`type-body-s ${styles.meta}`}>
-            {post.author?.nickname ?? '알 수 없음'} · {formatDate(post.created_at)}
+            {post.author?.nickname ?? '탈퇴한 회원'} · {formatDate(post.created_at)}
           </p>
           <p className={`type-body-l ${styles.content}`}>{post.content}</p>
 

@@ -78,3 +78,23 @@
     padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-2xl);
   }
 }
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+
+.footerLinks a {
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+}
+
+.footerLinks a:hover {
+  color: var(--color-text-primary);
+}
+
+.footerLinks span {
+  color: var(--color-text-disabled);
+}

@@ -34,6 +34,14 @@ describe('decideRedirect', () => {
     expect(decideRedirect('/companies', true)).toBeNull()
   })
 
+  it.each(['/terms', '/privacy'])('약관 문서 %s 는 가입 전에도 읽을 수 있다', (path) => {
+    expect(decideRedirect(path, false)).toBeNull()
+  })
+
+  it.each(['/terms', '/privacy'])('약관 문서 %s 는 로그인 후에도 그대로 보여 준다', (path) => {
+    expect(decideRedirect(path, true)).toBeNull()
+  })
+
   it('비로그인 사용자가 공개 경로와 접두어만 겹치는 경로에 접근하면 /login으로 보낸다', () => {
     expect(decideRedirect('/homework', false)).toBe('/login')
   })

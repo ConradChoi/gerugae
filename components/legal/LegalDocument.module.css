@@ -1,0 +1,114 @@
+.doc {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-3xl);
+  color: var(--color-text-primary);
+}
+
+.doc h1 {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-xl);
+}
+
+.doc h2 {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
+  margin: var(--spacing-2xl) 0 var(--spacing-sm);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.doc h3 {
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  margin: var(--spacing-xl) 0 var(--spacing-2xs);
+}
+
+.doc p,
+.doc li {
+  font-size: 15px;
+  line-height: 26px;
+  color: var(--color-text-secondary);
+}
+
+.doc p {
+  margin: 0 0 var(--spacing-sm);
+}
+
+.doc ul,
+.doc ol {
+  margin: 0 0 var(--spacing-sm);
+  padding-left: var(--spacing-lg);
+}
+
+.doc li {
+  margin-bottom: var(--spacing-3xs);
+}
+
+.doc li::marker {
+  color: var(--color-text-disabled);
+}
+
+.doc strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.doc hr {
+  height: 0;
+  margin: var(--spacing-2xl) 0;
+  border: 0;
+  border-top: 1px solid var(--color-border-default);
+}
+
+.doc a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+.doc table {
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.doc th,
+.doc td {
+  padding: var(--spacing-2xs) var(--spacing-xs);
+  border: 1px solid var(--color-border-default);
+  text-align: left;
+  color: var(--color-text-secondary);
+}
+
+.doc th {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .doc {
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-2xl);
+  }
+
+  .doc h1 {
+    font-size: 26px;
+    line-height: 34px;
+  }
+}
+
+.notice {
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.notice p:last-child {
+  margin-bottom: 0;
+}

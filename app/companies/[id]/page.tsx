@@ -166,7 +166,7 @@ export default async function CompanyDetailPage({
                         {post.title}
                       </Link>
                       <span className={`type-body-s ${styles.author}`}>
-                        {post.author?.nickname ?? '알 수 없음'} · {formatDate(post.created_at)}
+                        {post.author?.nickname ?? '탈퇴한 회원'} · {formatDate(post.created_at)}
                       </span>
                     </div>
                   </li>
@@ -191,7 +191,7 @@ export default async function CompanyDetailPage({
                 <div className={styles.cardHead}>
                   <Rating value={review.rating} size={18} />
                   <span className={`type-body-s ${styles.author}`}>
-                    {review.author?.nickname ?? '알 수 없음'} · {formatDate(review.created_at)}
+                    {review.author?.nickname ?? '탈퇴한 회원'} · {formatDate(review.created_at)}
                   </span>
                 </div>
                 {review.review_tags.length > 0 && (

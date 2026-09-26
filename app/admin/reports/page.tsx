@@ -94,7 +94,7 @@ export default async function AdminReportsPage() {
                         {TARGET_LABEL[report.target_type]} · {report.reason}
                       </span>
                       <span className={`type-body-s ${styles.meta}`}>
-                        {report.reporter?.nickname ?? '알 수 없음'} ·{' '}
+                        {report.reporter?.nickname ?? '탈퇴한 회원'} ·{' '}
                         {formatDateTime(report.created_at)}
                       </span>
                     </div>
