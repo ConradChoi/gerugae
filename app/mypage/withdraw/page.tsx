@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { requireMember } from '@/lib/membership'
+import { requireUser } from '@/lib/membership'
 import { WithdrawForm } from '@/components/WithdrawForm'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -12,7 +12,9 @@ export const metadata: Metadata = {
 }
 
 export default async function WithdrawPage() {
-  const { supabase, user } = await requireMember()
+  // 초대 코드를 쓰지 않은 계정도 탈퇴할 수 있어야 한다. 코드를 못 받았다고
+  // 계정을 못 지우면 이메일과 비밀번호가 본인 의사와 무관하게 남는다.
+  const { supabase, user } = await requireUser()
 
   const [{ count: reviewCount }, { count: postCount }] = await Promise.all([
     supabase

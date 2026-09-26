@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { InviteForm } from '@/components/InviteForm'
@@ -46,6 +47,10 @@ export default async function InvitePage() {
                 수 있습니다.
               </p>
             </div>
+            <p className={`type-body-s ${styles.altLink}`}>
+              이용하지 않으시겠다면 <Link href="/mypage/withdraw">회원 탈퇴</Link>로 계정을 지울 수
+              있습니다.
+            </p>
           </section>
         </div>
       </main>
