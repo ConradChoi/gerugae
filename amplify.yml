@@ -1,0 +1,23 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci --cache .npm --prefer-offline
+    build:
+      commands:
+        # Amplify 콘솔의 환경변수는 빌드 단계에만 주어진다.
+        # NEXT_PUBLIC_ 값은 빌드 때 번들에 박히지만, 서버에서만 읽는
+        # SUPABASE_SERVICE_ROLE_KEY 는 런타임에 그대로는 닿지 않는다.
+        # .env.production 에 옮겨 담아 SSR 런타임이 읽을 수 있게 한다.
+        # (이 파일은 서버 쪽 산출물에만 들어가고 브라우저로 가지 않는다)
+        - env | grep -e '^SUPABASE_SERVICE_ROLE_KEY=' >> .env.production || echo "SUPABASE_SERVICE_ROLE_KEY 가 설정되지 않았습니다 — 회원 탈퇴가 동작하지 않습니다"
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - .npm/**/*

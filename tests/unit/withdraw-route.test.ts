@@ -15,8 +15,10 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
+const createAdminClientMock = vi.fn()
+
 vi.mock('@/lib/supabase/admin', () => ({
-  createAdminClient: () => ({ auth: { admin: { deleteUser: deleteUserMock } } }),
+  createAdminClient: () => createAdminClientMock(),
 }))
 
 import { POST } from '@/app/api/account/withdraw/route'
@@ -34,6 +36,8 @@ beforeEach(() => {
   signInWithPasswordMock.mockReset()
   signOutMock.mockReset()
   deleteUserMock.mockReset()
+  createAdminClientMock.mockReset()
+  createAdminClientMock.mockReturnValue({ auth: { admin: { deleteUser: deleteUserMock } } })
 
   getUserMock.mockResolvedValue({ data: { user: { id: 'u1', email: 'me@example.com' } } })
   signInWithPasswordMock.mockResolvedValue({ error: null })
@@ -102,6 +106,24 @@ describe('POST /api/account/withdraw', () => {
     expect(response.status).toBe(500)
     expect(signOutMock).not.toHaveBeenCalled()
     expect(consoleErrorSpy).toHaveBeenCalled()
+    consoleErrorSpy.mockRestore()
+  })
+
+  it('서비스 롤 키가 없으면 설정 문제임을 알린다', async () => {
+    // 배포 환경의 서버 로그를 바로 볼 수 없어, 설정 누락인지 삭제 실패인지
+    // 화면에서 가려낼 수 있어야 한다.
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    createAdminClientMock.mockImplementation(() => {
+      throw new Error('Missing environment variable: SUPABASE_SERVICE_ROLE_KEY')
+    })
+
+    const response = await POST(request({ password: 'pw', confirmed: true }))
+    const body = await response.json()
+
+    expect(response.status).toBe(500)
+    expect(body.reason).toBe('missing_service_role_key')
+    expect(JSON.stringify(body)).not.toContain('SUPABASE_SERVICE_ROLE_KEY')
+    expect(signOutMock).not.toHaveBeenCalled()
     consoleErrorSpy.mockRestore()
   })
 

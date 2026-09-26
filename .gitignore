@@ -14,6 +14,8 @@ out/
 .env
 .env.local
 .env*.local
+# Amplify 빌드가 서비스 롤 키를 여기에 써 넣는다 (amplify.yml)
+.env.production
 
 # Supabase local
 .supabase/
