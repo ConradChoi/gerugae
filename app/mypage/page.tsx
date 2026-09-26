@@ -190,6 +190,17 @@ export default async function MyPage() {
               </ul>
             )}
           </section>
+
+          <section className={styles.panel}>
+            <h2 className="type-h3">회원 탈퇴</h2>
+            <p className={`type-body-s ${styles.meta}`}>
+              탈퇴해도 지금까지 쓰신 후기와 정보글은 남습니다. 지우고 싶은 글이 있다면 먼저 삭제해
+              주세요.
+            </p>
+            <Link href="/mypage/withdraw">
+              <Button variant="secondary">탈퇴 안내 보기</Button>
+            </Link>
+          </section>
         </div>
       </main>
       <Footer />
