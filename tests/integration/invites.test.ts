@@ -75,6 +75,26 @@ describe.skipIf(!hasCredentials)('초대 코드', () => {
     expect(wrongResult).toBe('존재하지 않는 코드입니다')
   })
 
+  it('초대 경로를 담은 컬럼은 일반 회원에게 조회되지 않는다', async () => {
+    const { client } = await sharedUser('stranger')
+
+    for (const column of ['member_since', 'invited_by', 'invite_code_id']) {
+      const { error } = await client.from('profiles').select(column).limit(1)
+      expect(error, `${column} 이 노출됨`).not.toBeNull()
+    }
+  })
+
+  it('관리자용 회원 목록 함수는 관리자가 아니면 빈 결과를 준다', async () => {
+    const { client } = await sharedUser('stranger')
+
+    // 관리자에게는 초대 경로가 보여야 하고(운영 화면이 이 함수를 쓴다),
+    // 관리자가 아니면 아무것도 나오지 않아야 한다.
+    const { data, error } = await client.rpc('admin_list_members', { limit_count: 10 })
+
+    expect(error).toBeNull()
+    expect(data).toEqual([])
+  })
+
   it('남의 초대 코드는 조회되지 않는다', async () => {
     const owner = await sharedUser('author')
     const { data: issued } = await owner.client.rpc('issue_invite_code')

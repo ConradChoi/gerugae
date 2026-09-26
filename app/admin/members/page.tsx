@@ -15,7 +15,7 @@ type Member = {
   nickname: string
   created_at: string
   member_since: string | null
-  inviter: { nickname: string } | null
+  inviter_nickname: string | null
 }
 
 function formatDate(iso: string | null) {
@@ -39,11 +39,9 @@ export default async function AdminMembersPage() {
     notFound()
   }
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, nickname, created_at, member_since, inviter:profiles!profiles_invited_by_fkey(nickname)')
-    .order('created_at', { ascending: false })
-    .limit(200)
+  // profiles의 member_since/invited_by는 조회 권한이 없다. 관리자만 통과하는
+  // 함수로만 열어 두었기 때문에(0007) 여기서도 함수를 통해 읽는다.
+  const { data, error } = await supabase.rpc('admin_list_members', { limit_count: 200 })
 
   if (error) {
     console.error('AdminMembersPage: 회원 목록 조회 실패', error)
@@ -75,7 +73,7 @@ export default async function AdminMembersPage() {
                     </span>
                   </div>
                   <p className={`type-body-s ${styles.meta}`}>
-                    초대한 사람: {member.inviter?.nickname ?? '없음 (직접 가입 또는 운영자)'}
+                    초대한 사람: {member.inviter_nickname ?? '없음 (직접 가입 또는 운영자)'}
                   </p>
                 </li>
               ))}
