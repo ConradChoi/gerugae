@@ -42,6 +42,14 @@ describe('decideRedirect', () => {
     expect(decideRedirect(path, true)).toBeNull()
   })
 
+  it.each(['/contact', '/contact/status'])(
+    '문의 창구 %s 는 로그인 없이 쓸 수 있다',
+    (path) => {
+      // 삭제를 요청하는 기업이나 글에 개인정보가 담긴 제3자는 회원이 아니다.
+      expect(decideRedirect(path, false)).toBeNull()
+    }
+  )
+
   it('비로그인 사용자가 공개 경로와 접두어만 겹치는 경로에 접근하면 /login으로 보낸다', () => {
     expect(decideRedirect('/homework', false)).toBe('/login')
   })
