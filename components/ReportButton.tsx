@@ -5,18 +5,22 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import styles from '@/components/ui/Field.module.css'
 
-export type ReportTarget = 'review' | 'post' | 'company'
+export type ReportTarget = 'review' | 'post' | 'company' | 'question' | 'answer'
 
 const REASONS: Record<ReportTarget, string[]> = {
   review: ['허위사실', '명예훼손', '욕설/비방', '개인정보 노출', '광고/스팸', '기타'],
   post: ['광고/스팸', '욕설/비방', '개인정보 노출', '허위사실', '기타'],
   company: ['정보 오류', '기타'],
+  question: ['광고/스팸', '욕설/비방', '개인정보 노출', '허위사실', '기타'],
+  answer: ['광고/스팸', '욕설/비방', '개인정보 노출', '허위사실', '기타'],
 }
 
 const TITLES: Record<ReportTarget, string> = {
   review: '이 후기를 신고합니다',
   post: '이 글을 신고합니다',
   company: '기업 정보 오류를 알립니다',
+  question: '이 질문을 신고합니다',
+  answer: '이 답변을 신고합니다',
 }
 
 export function ReportButton({

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { requireMember } from '@/lib/membership'
 import { MemberHeader } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { HiddenNotice } from '@/components/ui/HiddenNotice'
 import { NicknameForm } from '@/components/NicknameForm'
 import { InviteCodePanel } from '@/components/InviteCodePanel'
 import { DeleteButton } from '@/components/ui/DeleteButton'
@@ -32,21 +33,6 @@ type MyPost = {
   company: { id: string; name: string } | null
 }
 
-function HiddenNotice() {
-  return (
-    <p
-      className="type-body-s"
-      style={{
-        padding: 'var(--spacing-xs) var(--spacing-sm)',
-        borderRadius: 'var(--radius-sm)',
-        background: 'var(--color-status-error-bg)',
-        color: 'var(--color-status-error-fg)',
-      }}
-    >
-      신고 검토 결과 가려진 글입니다. 나와 운영자에게만 보입니다.
-    </p>
-  )
-}
 
 function formatDate(iso: string) {
   const d = new Date(iso)

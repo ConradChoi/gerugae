@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 
 type Props = {
-  table: 'reviews' | 'community_posts'
+  table: 'reviews' | 'community_posts' | 'questions' | 'answers'
   id: string
   title: string
   description: string

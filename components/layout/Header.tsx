@@ -32,6 +32,9 @@ export function MemberHeader() {
         <Link href="/companies" className={`${styles.navLink} ${styles.hideOnMobile}`}>
           기업 찾기
         </Link>
+        <Link href="/questions" className={`${styles.navLink} ${styles.hideOnMobile}`}>
+          묻고 답하기
+        </Link>
         <Link href="/mypage" className={`${styles.navLink} ${styles.hideOnMobile}`}>
           마이페이지
         </Link>

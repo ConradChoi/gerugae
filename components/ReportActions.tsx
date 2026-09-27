@@ -6,15 +6,20 @@ import { Button } from '@/components/ui/Button'
 
 type Props = {
   reportId: string
-  targetType: 'review' | 'post' | 'company'
+  targetType: 'review' | 'post' | 'company' | 'question' | 'answer'
   targetId: string
   adminId: string
 }
 
 /** 기업 신고는 글이 아니라 정보 오류이므로 가림 대상이 아니다 */
-const HIDEABLE: Record<Props['targetType'], 'reviews' | 'community_posts' | null> = {
+const HIDEABLE: Record<
+  Props['targetType'],
+  'reviews' | 'community_posts' | 'questions' | 'answers' | null
+> = {
   review: 'reviews',
   post: 'community_posts',
+  question: 'questions',
+  answer: 'answers',
   company: null,
 }
 

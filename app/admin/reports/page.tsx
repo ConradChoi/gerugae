@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 type Report = {
   id: string
-  target_type: 'review' | 'post' | 'company'
+  target_type: 'review' | 'post' | 'company' | 'question' | 'answer'
   target_id: string
   reason: string
   detail: string | null
@@ -23,7 +23,7 @@ type Report = {
   reporter: { nickname: string } | null
 }
 
-const TARGET_LABEL = { review: '후기', post: '정보글', company: '기업 정보' }
+const TARGET_LABEL = { review: '후기', post: '정보글', company: '기업 정보', question: '질문', answer: '답변' }
 const STATUS_LABEL = { pending: '검토 대기', hidden: '가림 처리됨', kept: '유지' }
 
 function formatDateTime(iso: string) {
